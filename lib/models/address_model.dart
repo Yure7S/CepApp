@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 class AddressModel {
   final String cep;
   final String logradouro;
@@ -38,5 +40,5 @@ class AddressModel {
     );
   }
 
-  factory AddressModel.fromJson(String json) => AddressModel.fromMap(json.decode(json));
+  factory AddressModel.fromJson(String json) => AddressModel.fromMap(jsonDecode(json));
 }
