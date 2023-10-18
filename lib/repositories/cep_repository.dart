@@ -1,3 +1,5 @@
+import 'package:cep_app/models/address_model.dart';
+
 abstract interface class CepRepository {
-  Future getCep(String cep);
+  Future<AddressModel> getCep(String cep);
 }
