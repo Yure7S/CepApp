@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 class HomePageState extends State<HomePage> {
   final CepRepository cepRepository = CepRepositoryImpl();
   AddressModel? addressModel;
+  var loading = false;
 
   final formKey = GlobalKey<FormState>();
   final cepEC = TextEditingController();
@@ -51,21 +52,61 @@ class HomePageState extends State<HomePage> {
                           try {
                             final valid = formKey.currentState?.validate() ?? false;
                             if (valid) {
+                              setState(() => loading = true);
+                              setState(() => addressModel = null);
                               AddressModel am = await cepRepository.getCep(cepEC.text);
                               setState(() => addressModel = am);
+                              setState(() => loading = false);
                             }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("The zip code entered is not valid"))
-                            );
+                            setState(() => loading = false);
+                            setState(() => addressModel = null);
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("The zip code entered is not valid")));
                           }
                         },
                         child: const Text("Search")),
                     const SizedBox(height: 25),
                     Visibility(
+                      visible: loading,
+                      child: const CircularProgressIndicator(),
+                    ),
+                    Visibility(
                       visible: addressModel != null,
-                      child: Text("${addressModel?.logradouro}, ${addressModel?.bairro}, ${addressModel?.localidade} - ${addressModel?.uf}"),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: const Border(left: BorderSide(
+                              color: Colors.deepPurple,
+                              width: 5,
+                            ),
+                          ),
+                          // borderRadius: BorderRadius.circular(15),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3)
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            children: [
+                              Text(
+                                "${addressModel?.logradouro}, ${addressModel?.bairro}, ${addressModel?.localidade} - ${addressModel?.uf}",
+                                style: const TextStyle(
+                                  fontSize: 17
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
                     )
+                    
                   ],
                 ))),
       ),
